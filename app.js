@@ -5,10 +5,9 @@ const cors = require('cors');
 const csurf = require('csurf');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
-const { environment } = require('./config');
+// const { sequelize } = require('./db/models');
 
 const environment = require('./config');
-const { sequelize } = require('./db/models');
 const isProduction = environment === 'production';
 
 const app = express();
@@ -38,4 +37,9 @@ app.use(
     })
 )
 
-const store = new SequelizeStore({ db: sequelize });
+const routes = require('./routes');
+app.use(routes);
+
+// const store = new SequelizeStore({ db: sequelize });
+
+module.exports = app;
