@@ -14,8 +14,14 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   TaggedTask.init({
-    taskId: DataTypes.INTEGER,
-    tagId: DataTypes.INTEGER
+    taskId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    tagId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    }
   }, {
     sequelize,
     modelName: 'TaggedTask',

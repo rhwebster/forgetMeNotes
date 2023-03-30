@@ -11,10 +11,15 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Tag.belongsToMany(models.Task, { through: "TaggedTask", foreignKey: "tagId", otherKey: "taskId", as: "tagwithtasks" });
     }
   }
   Tag.init({
-    name: DataTypes.STRING
+    name: {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      unique: true
+    }
   }, {
     sequelize,
     modelName: 'Tag',

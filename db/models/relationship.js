@@ -14,17 +14,64 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Relationship.init({
-    user1Id: DataTypes.INTEGER,
-    user2Id: DataTypes.INTEGER,
-    status: DataTypes.INTEGER,
-    lastActionUserId: DataTypes.INTEGER,
-    user1Role: DataTypes.ARRAY,
-    user2Role: DataTypes.ARRAY,
-    createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE
-  }, {
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER
+    },
+    user1Id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "Users",
+        key: 'id'
+      }
+    },
+    user2Id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "Users",
+        key: 'id'
+      }
+    },
+    status: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    lastActionUserId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "Users",
+        key: 'id'
+      }
+    },
+    user1Role: {
+      type: DataTypes.ARRAY(DataTypes.INTEGER)
+    },
+    user2Role: {
+      type: DataTypes.ARRAY(DataTypes.INTEGER)
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
+    updatedAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
+  }, 
+  {
     sequelize,
     modelName: 'Relationship',
+    indexes: [
+      {
+        unique: true,
+        fields: ['user1Id', 'user2Id']
+      }
+    ]
   });
   return Relationship;
 };

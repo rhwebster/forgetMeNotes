@@ -11,13 +11,29 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      User.hasMany(models.Task, { foreignKey: "userId" });
+      User.hasMany(models.List, { foreignKey: "userId" });
     }
   }
   User.init({
-    email: DataTypes.STRING,
-    firstName: DataTypes.STRING,
-    lastName: DataTypes.STRING,
-    hashedPassword: DataTypes.STRING
+    email: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      unique: true,
+    },
+    firstName: {
+      type: DataTypes.STRING(30),
+      allowNull: false,
+    },
+    lastName: {
+      type: DataTypes.STRING(30),
+      allowNull: false,
+    },
+    hashedPassword: {
+      type: DataTypes.STRING.BINARY,
+      allowNull: false,
+      unique: true,
+    }
   }, {
     sequelize,
     modelName: 'User',
