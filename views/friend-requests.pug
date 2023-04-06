@@ -1,0 +1,10 @@
+include utils.pug
+form(id="friend-request-modal-form")
+  if locals.authenticated
+    h4(id="friend-request-modal-header")
+    input(type='hidden' name='_csrf' value=csrfToken)
+    p(id='p-add-errors' style="color:red;")
+    p(id="list-of-friend-requests")
+    div(class='py-4 modal-buttons')
+      button(id="close-friend-request-modal-cancel") Close
+  else

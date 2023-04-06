@@ -4,7 +4,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
     const password = document.querySelector("#password");
     demoButton.addEventListener("click", (event) => {
         event.preventDefault();
-        email.value = "demo@demo.com";
-        password.value = "111111";
+        email.value = "bruce@wayne.inc";
+        password.value = "password2";
     });
 });

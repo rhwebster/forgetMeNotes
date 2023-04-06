@@ -1,9 +1,6 @@
 const express = require('express');
 require('express-async-errors');
 const morgan = require('morgan');
-const cors = require('cors');
-const csurf = require('csurf');
-const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const { sequelize } = require('./db/models');
 const path = require('path');
@@ -21,9 +18,6 @@ const tasksApiRouter = require('./api/tasks');
 const apiListsRouter = require('./api/lists');
 const apiTagsRouter = require('./api/tags');
 
-const { environment } = require('./config');
-const isProduction = environment === 'production';
-
 const app = express();
 app.set("view engine", "pug")
 
@@ -31,7 +25,7 @@ app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser(sessionSecret));
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 const store = new SequelizeStore({ db: sequelize });
@@ -42,7 +36,7 @@ app.use(session({
     resave: false,
 }))
 
-store.sync()
+store.sync();
 
 app.use(restoreUser);
 app.use('/', indexRouter);
@@ -63,25 +57,5 @@ app.use((err, req, res, next) => {
     res.status(err.status || 500);
     res.render("error");
 })
-
-
-if (!isProduction) {
-    app.use(cors());
-}
-
-app.use(helmet({
-    contentSecurityPolicy: false
-}));
-
-app.use(
-    csurf({
-        cookie: {
-            secure: isProduction,
-            sameSite: isProduction && "Lax",
-            httpOnly: true
-        }
-    })
-)
-
 
 module.exports = app;
