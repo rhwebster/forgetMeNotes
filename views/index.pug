@@ -1,0 +1,112 @@
+extends layout
+
+append head
+  //- add page specific styles by appending to the head
+  link(rel="stylesheet" href="/stylesheets/index.css")
+  
+  //- add page specific js
+  script(src=`/javascripts/index.js` type="module" defer)
+
+block content 
+  div(id='wholepage' class="wholepage")
+    if !locals.authenticated
+      div(id='top-navbar' class='top-navbar')
+        div
+          a(href='/'): img(src='/images/logo' alt='login' style='width:100px;height:100px;' )      
+        span
+          a(href='/demo') Demo
+        span
+          a(href='/about') About
+        span
+          button
+            a(href='/users/login') Login
+        span
+          button
+            a(href='/users/signup') Sign up
+    else
+      include top-navbar.pug
+      div(id='main-body' class='main-body')
+        div(id='side-navbar' class='side-navbar')
+          div(id="fmn-logo")
+            a(href='/'): img(src='/images/logo' alt='login' style='width:100px;height:100px;')
+          div(class="due-nav nav-ele")
+            div(class="inbox-link left-link" id='inbox')
+            div(class="inbox-link left-link" id='all-tasks')
+              a(class='timed-list') All Tasks
+            div(class="inbox-link left-link" id='today')
+              a(class='timed-list') Today
+            div(class="inbox-link left-link" id='tomorrow')
+              a(class='timed-list') Tomorrow
+            div(class="inbox-link left-link" id='this-week')
+              a(class='timed-list') This Week
+            div(class="inbox-link left-link" id='next-week')
+              a(class='timed-list') Next Week
+          div(class='tags nav-ele' id='friends')
+            div(class="tags-header")
+              span(id="tag-span") People
+              span 
+                button(id='addFriendBtn' class="tag-button") +
+            div(id='list-of-friendss-div' class='list-of-tags-class')              
+          div(class='tags nav-ele' id='lists')
+            div(class="tags-header")
+              span(id="tag-span") Lists
+              span 
+                button(id='addListBtn' class="tag-button") +
+            div(id='list-of-lists-div' class='list-of-tags-class')
+          div(class='tags nav-ele' id='tags')
+            div(class="tags-header")
+              span(id="tag-span") Tags
+              span 
+                button(id='addTagBtn' class="tag-button") +
+            div(id='list-of-tags-div' class='list-of-tags-class')
+        div(id="right-body" class="right-body")
+          div(id='main-panel' class='main-panel')
+            include tasks-view.pug
+            div(id="myModal" class="modal")
+              //- Modal content
+              div(class="modal-content")
+                span(class="close fa" id="modal-x") &#xf00d
+                include add-tag-or-list-pop-up.pug
+            div(id="friendModal" class="modal")
+              //- Modal content
+              div(class="modal-content")
+                span(class="close fa" id="friend-modal-x") &#xf00d
+                include add-a-friend.pug
+            div(id="friendRequestModal" class="modal")
+              //- Modal content
+              div(class="friend-modal-content")
+                include friend-requests.pug
+          div(id='side-panel' class='side-panel')
+            div(id="current-list-header") Placeholder
+            div(id="num-tasks-container")
+          div(id="task-detail-panel" class="panel-hidden")
+            div(id="task-info")
+              div(id="close-button-panel")
+                span(id="close-text") close x
+              div(id="task-name-panel")
+                input(id="name-panel-text")
+              div(id="due-elements" class="panel-elements")
+                span(id="due-text-panel" class="panel-text") due
+                span(id="due-date-input")
+                input(type="date" id="side-due-input")
+              div(id="list-info-panel" class="panel-elements") 
+                span(id="list-header-text" class="panel-text") list
+                div(id="current-list")
+                select(id='list-selector')
+                  each list in lists
+                    option(value=list.id id=`option-list-${list.id}`) #{list.name}
+              div(id="tags-div")
+                span(id="tags-header-text") tags
+                div(id="tags-list")
+                select(id='tag-selector')
+                  option(value="" id="default-option" selected disabled) Add tag
+                  each tag in tags
+                    option(value=tag.id id=`option-${tag.id}`) #{tag.name}
+            div(id="notes")
+              div(id="notes-header") Notes
+              div(id="add-a-note")
+                input(id="notes-input" placeholder="Add a note...")
+                div(id="add-note-button") 
+                  span(id="note-button-text") Save
+              div(id="notes-list-div")
+                ul(id="note-list")
