@@ -1,0 +1,14 @@
+extends layout
+append head
+  link(rel="stylesheet" href="/stylesheets/tags-and-lists.css")
+include utils.pug
+
+  block content
+    input(type='hidden' name='_csrf' value=csrfToken)
+    div
+      each listItem in list
+        div #{listItem.name}
+          //- p: a(href="/lists:id") checkout list
+    div(class='py-4')
+      p: a(href="/") Back To Home
+    div(class='py-4')

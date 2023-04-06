@@ -8,7 +8,7 @@ const loginUser = (req, res, user) => {
 };
 
 const logoutUser = (req, res) => {
-    delete res.session.auth;
+    delete req.session.auth;
 };
 
 const requireAuth = (req, res, next) => {
@@ -22,7 +22,7 @@ const restoreUser = async (req, res, next) => {
     if (req.session.auth) {
         const { userId } = req.session.auth;
         try {
-            const user = await db.User.findbyPk(userId);
+            const user = await db.User.findByPk(userId);
             if (user) {
                 res.locals.authenticated = true;
                 res.locals.user = user;
