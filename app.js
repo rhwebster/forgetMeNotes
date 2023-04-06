@@ -7,7 +7,7 @@ const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 // const { sequelize } = require('./db/models');
 
-const environment = require('./config');
+const { environment } = require('./config');
 const isProduction = environment === 'production';
 
 const app = express();
@@ -21,11 +21,9 @@ if (!isProduction) {
     app.use(cors());
 }
 
-app.use(
-    helmet.crossOriginResourcePolicy({
-        policy: "cross-origin"
-    })
-);
+app.use(helmet({
+    contentSecurityPolicy: false
+}));
 
 app.use(
     csurf({
@@ -40,6 +38,5 @@ app.use(
 const routes = require('./routes');
 app.use(routes);
 
-// const store = new SequelizeStore({ db: sequelize });
 
 module.exports = app;
