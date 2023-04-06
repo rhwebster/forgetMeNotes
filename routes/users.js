@@ -74,3 +74,115 @@ const userValidators = [
         }),  
 ];
 
+router.get('/signup', csrfProtection, (req, res) => {
+    const user = db.User.build();
+    res.render("sign-up", {
+        title: "Sign Up",
+        style: "./stylesheets/sign-up.css",
+        user,
+        csrfToken: req.csrfToken(),
+    });
+});
+
+router.post('/signup', csrfProtection, userValidators, asyncHandler(async (req, res) => {
+    const { email, firstName, lastName, password } = req.body;
+    const user = db.User.build({ email, firstName, lastName });
+
+    const validatorErrors = validationResult(req);
+
+    if (validatorErrors.isEmpty()) {
+        const hashedPassword = await bcrypt.hash(password, 8);
+        user.hashedPassword = hashedPassword;
+        await user.save();
+        await db.List.create({ name: "Inbox", userId: user.id });
+        loginUser(req, res, user);
+        res.redirect('/');
+    } else {
+        const errors = validatorErrors.array().map((error) => error.msg);
+        res.render("sign-up", {
+            title: "Sign Up",
+            style: "./stylesheets/sign-up.css",
+            user,
+            errors,
+            csrfToken: req.csrfToken(),
+        });
+    }
+}));
+
+const loginValidators = [
+    check("email")
+        .exists({ checkFalsy: true })
+        .withMessage("Please provide an email address"),
+    check("password")
+        .exists({ checkFalsy: true })
+        .withMessage("Please provide a valid password"),
+];
+
+router.post('/login', csrfProtection, loginValidators, asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+    let errors = [];
+    const validatorErrors = validationResult(req);
+
+    if (validatorErrors.isEmpty()) {
+        const user = await db.User.findOne({ where: { email } });
+
+        if (user !== null) {
+            const passwordMatch = await bcrypt.compare(
+                password,
+                user.hashedPassword.toString()
+            );
+
+            if (passwordMatch) {
+                loginUser(req, res, user);
+                return res.redirect("/");
+            }
+        }
+
+        errors.push(
+            "Invalid credentials. Please doublecheck email address and password"
+        );
+    } else {
+        errors = validationErrors.array().map((error));
+    }
+
+    res.render("log-in", {
+        title: "Login",
+        email,
+        errors,
+        csrfToken: req.csrfToken(),
+    });
+}));
+
+router.all('/logout', (req, res) => {
+    logoutUser(req, res);
+    res.redirect("/users/login");
+});
+
+router.post('/addfriend', requireAuth, asyncHandler(async (req, res) => {
+    const { userId } = req.session.auth;
+    const { email } = req.body;
+    const userToAdd = await db.User.findOne({ where: { email } });
+    if (userToAdd) {
+        let user1Id = userId;
+        let user2Id = userToAdd.id;
+        if (user1Id > user2Id) {
+            let temp = user1Id;
+            let user1Id = user2Id;
+            user2Id = temp;
+        }
+        const requests = await db.Relationship.findOne({
+            where: { user1Id, user2Id }
+        });
+        if (requests) {
+            return res.status(400).json({ error: "Relationship already exists" });
+        }
+
+        const request = await db.Relationship.create({
+            user1Id, user2Id, status: 0, lastActionUserId: userId
+        });
+        res.json({ request });
+    } else {
+        res.status(400).json({ error: "User not found to add" });
+    }
+}));
+
